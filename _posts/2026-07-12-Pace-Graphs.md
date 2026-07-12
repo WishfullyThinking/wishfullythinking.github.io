@@ -2173,7 +2173,7 @@ that were run on ground rated “Good”. I have included a least-squares
 regression line for illustrative purposes — *not* to demonstrate
 correlation or statistical significance!
 
-![](https://github.com/WishfullyThinking/wishfullythinking.github.ioimages/derby-graph-1.png)
+![](https://github.com/WishfullyThinking/wishfullythinking.github.io/images/derby-graph-1.png)
 
 The connection here seems very weak. Fast Derbies have been won by
 horses towards the front; slow Derbies have been won by those running at
@@ -2182,14 +2182,14 @@ the back.
 How about the other three-year-old Fuchu G1, the NHK Mile? We’ll look at
 both the 600m and the 400m sectionals, because it’s a shorter race.
 
-![](https://github.com/WishfullyThinking/wishfullythinking.github.ioimages/nhk-mile-graph-1.png)![](https://github.com/WishfullyThinking/wishfullythinking.github.ioimages/nhk-mile-graph-2.png)
+![](https://github.com/WishfullyThinking/wishfullythinking.github.io/images/nhk-mile-graph-1.png)![](https://github.com/WishfullyThinking/wishfullythinking.github.io/images/nhk-mile-graph-2.png)
 
 Intriguingly, the general pattern *does* seem to hold true for the NHK
 Mile, in a way that it doesn’t for the Japanese Derby.
 
 What happens if we look at *podium* finishes, not just the winners?
 
-![](https://github.com/WishfullyThinking/wishfullythinking.github.ioimages/podium-graph-1.png)![](https://github.com/WishfullyThinking/wishfullythinking.github.ioimages/podium-graph-2.png)
+![](https://github.com/WishfullyThinking/wishfullythinking.github.io/images/podium-graph-1.png)![](https://github.com/WishfullyThinking/wishfullythinking.github.io/images/podium-graph-2.png)
 
 Interestingly, this seems to barely shift the picture. In fact, the top
 3 *within the same year* seem to come from all over the place, too, and
