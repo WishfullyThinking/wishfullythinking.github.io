@@ -1,0 +1,281 @@
+---
+layout: post
+title: Late Surgers Like Fast Races, and Other Half-Truths
+output:
+  md_document:
+    variant: markdown_github
+    preserve_yaml: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_knit$set(base.dir = "~/Documents/Data-Science/GH-Pages/Horse-Sense/", base.url = "https://github.com/WishfullyThinking/wishfullythinking.github.io")
+knitr::opts_chunk$set(fig.path = "images/")
+library(tidyverse)
+library(rvest)
+library(stringi)
+library(lubridate)
+library(gt)
+library(scales)
+library(ggrepel)
+library(corrr)
+library(GGally)
+library(plotly)
+
+racecards = read_csv(file = "~/Documents/Data-Science/R-Works/Keiba-Database/Datasets/Updated_Data/July-26-racecards.csv")
+sectionals = read_csv (file = "~/Documents/Data-Science/R-Works/Keiba-Database/Datasets/Updated_Data/July-26-sectionals.csv")
+```
+
+
+```{r function_block, include = FALSE}
+
+
+sec_to_ms <- function(x){
+  
+  ifelse(x/60 == 0, as.char(x), paste0(as.integer(x/60), ":", 
+                                       sprintf("%04.1f", x%%60)))
+                                    
+  
+}
+
+pos_summariser <- function(position_vec){
+
+sapply(str_split(position_vec, "-"), 
+       function(x){
+         median(as.integer(x))
+       }
+       )
+}
+
+  # x = str_split(times, ":", n = 2)
+  # x = do.call(rbind.data.frame, x)
+  # colnames(x) = c("Minutes", "Seconds")
+  # 
+  # x$Minutes[x$Minutes == ""] = 0
+  # x$Minutes = as.integer(x$Minutes)
+  # x$Seconds = as.double(x$Seconds)
+  # 
+  # x$Total = x$Minutes * 60 + x$Seconds
+
+  
+  ft_to_sec <- function(times){
+    x = str_split_fixed(times, ":", n = 2)
+    x[x[, 1] == "", 1] = "0"
+    ft_sec = as.integer(x[, 1])*60 + as.double(x[,2])
+    return(ft_sec)
+  }
+  
+  times_analysis <- function(racename, places = 1){
+
+  ret_mat = racecards %>% filter(RaceName == racename, FP %in% places) %>% 
+    arrange((L3F)) %>% 
+    select(RaceDate, Horse, FT, L3F, `Pos. at Bends`, TrackCondition, FP)
+  
+  ret_mat$median_pos = pos_summariser(ret_mat$`Pos. at Bends`)
+  return(ret_mat)
+
+}
+
+  pretty_sectionals <- function(Race, RaceYear){
+  sectionals %>% 
+    filter(RaceName == Race, year(RaceDate) == RaceYear) %>%
+    mutate(TotalTime = sec_to_ms(cumsum(SectionalTime))) %>%
+    select(SectionalDistance, SectionalTime, TotalTime) %>%
+    rename("Sectional Distance (m)" = SectionalDistance,
+           "Sectional Time (s)" = SectionalTime,
+           "Total Time (m:s)" = TotalTime) %>%
+    gt() %>% 
+    tab_header(title = paste0("Sectional Times for the ", RaceYear, " ", Race))
+  }
+
+
+pace_graphs <- function(racename, chosen_sectional = 600, places = 1){
+
+race_sectionals =  sectionals %>%
+    filter(RaceName == racename) %>% 
+    group_by(RaceDate) %>%
+    arrange(SectionalDistance) %>%
+    mutate(total_time = cumsum(SectionalTime)) %>%
+    filter(SectionalDistance == chosen_sectional) %>% ungroup()
+  
+  new_mat = times_analysis(racename, places = places) %>% inner_join(race_sectionals, by = join_by(RaceDate))
+  
+  new_mat = new_mat[new_mat$Horse != "Falbrav", ]
+  
+  
+  new_mat = new_mat %>% filter(TrackCondition == "Gd")
+  
+  # # Finishing time
+  # show(new_mat %>% ggplot(aes(x = FT, y = median_pos)) + geom_text_repel(aes(label = Horse)) + labs(title = "Finishing Time vs Median Position at Bends",
+  # subtitle = paste0("For ", racename, " winners since 1993 on Good tracks"),
+  # x = "Finishing time in seconds",
+  # y = "Median position at bends"
+  # ) + scale_y_continuous(breaks = 1:max(new_mat$median_pos)) +
+  #   theme_classic() + geom_smooth(method = "lm", se = F))
+  
+  # Sectional time
+  if (length(places) == 1 ){
+    if(places == 1){
+  show(new_mat %>% ggplot(aes(x = total_time, y = median_pos)) + geom_text_repel(aes(label = Horse)) + labs(title = paste0("Median Position at Bends vs ", chosen_sectional,"m sectional time"),
+  subtitle = paste0("Of ", racename, " winners since 1993 on Good tracks"),
+  x = paste0(chosen_sectional, "m sectional time (in seconds)"),
+  y = "Median position at bends"
+  ) + scale_y_continuous(breaks = 1:max(new_mat$median_pos)) +
+    scale_x_continuous(breaks = breaks_width(0.5)) +
+    theme_classic() + geom_smooth(method = "lm", se = F, linewidth = 0.5))
+    }
+  }
+  else{
+    p = (new_mat %>% ggplot(aes(x = total_time, y = median_pos)) + 
+           geom_point(aes(colour = FP,  text = paste0("Horse: ", Horse,
+                                                      "<br> Year: ", year(RaceDate)))) + 
+           labs(title = paste0(
+           "<b>Median Position at Bends vs ", chosen_sectional, "m sectional time</b>",
+           "<br><span style='font-size: 12px; color: gray;'>Of ", racename, " Runners since 1993 on Good tracks</span>"
+         ),
+  x = paste0(chosen_sectional, "m sectional time (in seconds)"),
+  y = "Median position at bends"
+  ) + 
+    scale_x_continuous(breaks = breaks_width(0.5)) +
+    scale_y_continuous(breaks = 1:max(new_mat$median_pos)) +
+    theme_classic() + 
+    geom_smooth(method = "lm", se = F, linewidth = 0.5))
+    
+    ggplotly(p, tooltip = "text")
+  }
+}
+  
+  ## Permutation Test
+#   
+#   perm_df = data.frame(MP = new_mat$median_pos, FT = new_mat$total_time)
+#   perm_df
+#   test = cor(perm_df$FT, perm_df$MP)
+#   # scramble 
+#   
+#   nsim = 10000
+#   cor_vec = numeric(nsim)
+#   
+#   for (i in 1:nsim){
+#     
+#     scrambled_times = perm_df$FT[sample(length(perm_df$FT))]
+#     cor_vec[i] = cor(perm_df$MP, scrambled_times)
+#     
+# }
+
+# print(mean(test > cor_vec))
+
+pretty_positions <- function(HorseName){
+  racecards %>% 
+    filter(Horse == HorseName, Grade == "G1") %>%
+    select(RaceName, RaceDate, Horse, FP, `Pos. at Bends`) %>% 
+    arrange(RaceDate) %>%
+    mutate(Year = year(RaceDate)) %>%
+    select(-c(Horse, RaceDate)) %>%
+       select(RaceName, Year, `Pos. at Bends`, FP) %>%
+    rename("Finishing Position" = FP, Race = RaceName) %>%
+    gt() %>% 
+    tab_header(title = paste0("Positional Analysis of ", HorseName),
+               subtitle = "G1 Races Only")
+ 
+}
+
+```
+
+### Introduction
+
+A classic piece of horseracing wisdom goes like this: if the pace is great, surge late; if the leader is a snail, stay on their tail.    
+
+In other words, if the frontrunners go full-throttle at the start of the race, those attempting to match the pace tire themselves out by the home stretch and become easy pickings for the surgers and the closers. Conversely, if the frontrunners set a slow pace, then everyone is fresh enough to mount a late challenge, favouring the runners closer to the front. 
+
+This effect — so goes the traditional wisdom — is magnified or diminished by certain racecourses. Tokyo's enormous 525m of unbroken final straight allows for improbable catch-ups: a classic example is the 2022 Tenno Sho Autumn, where Panthalassa was leading by 15 lengths at the final turn but was caught by Equinox close to the wire. On the other hand, Hanshin is [notoriously favourable](https://idolhorse.com/horse-racing-news/japan/g1-guide-tips-osaka-hai/#:~:text=Hanshin's 2000m is quite a biased track,behind the leaders will have an advantage.) to those towards the front. Even the habitual closer Gold Ship was raced ahead in both his Takarazuka conquests. 
+
+Can we check is this common sense is empirically true? As it happens, for a rough guess at the truth, the statistical data comes almost ready-made.
+
+### Sectional Times: How Fast was the Early Pace?
+
+Those who know how to read sectional times can skip ahead to the next section. 
+
+How fast the front-runners are going can be quantified by _sectional data_. For a given race, the sectionals measure the time it took for the leading horse in the race to reach 200m, 400m, and so on. 
+
+```{r sectional-illustration, echo = F}
+
+pretty_sectionals("TENNO SHO (AUTUMN)", 2022)
+```
+
+This table can be read as follows. When the leading horse completed the first 200m, 12.6 seconds had elapsed. 10.9 seconds later, the leading horse reached the 400m point. Note that it doesn't have to be the same horse. It can be the case that the leader at 200m was not the leader at 400m. Sectional times measure the speed of the _race_, not any particular horse.
+
+What do the numbers tell us? In general, if the turf isn't too soft, sectional times of 12 seconds or so are "normal". Sectionals below 12 seconds are fast, above it are slow. This particular race, then, featured extremely rapid sectionals for nearly the whole race. It was, of course, Panthalassa's famous getaway — foiled just in time by Equinox. 
+
+Conversely, here's another race at Fuchu which featured a getaway, this time a successful one:
+
+```{r sectional-illustration-2, echo = F}
+
+pretty_sectionals("JAPAN CUP", 2003)
+```
+
+Tap Dance City won this race wire-to-wire by a margin of an incredible nine lengths. Can you guess how? The sectionals tell the story: Tap Dance City racked up an enormous lead running at a fairly reasonable pace, and his rivals — including the formidable Symboli Kris S and the Double Crown Neo Universe — entirely failed to catch him in the home stretch. 
+
+### Position at Bends: Where was the Winning Horse Relative to its Rivals?
+
+The winner only has to be at the front at the finish line, after all. 
+
+In most races, the horses jockey for position near the start, settle into their position till the final straight, and are then taken "off the bridle" and ridden hard to the end. As a result, where the racehorse was at each turn of the racecourse usefully approximates its overall position. 
+
+Take a girl like Gentildonna:
+
+```{r position-illustration, echo = F}
+
+pretty_positions("Gentildonna")
+
+```
+In most of her G1 efforts, she was raced close to the front, though she could also win racing from the back. Notice how stable her position at each bend is. It seems fair enough to say that she was kept in third position for the 2013 Takarazuka, or held in about ninth place for the Shuka Sho. This single statistic comprising four numbers is fairly representative of the flow of her races.
+
+Now consider Gold Ship, who — agent of chaos that he is — illustrates some of the limitations of this method.
+
+```{r golshi, echo = FALSE}
+
+pretty_positions("Gold Ship")
+
+```
+Of course, Gold Ship also had a fairly consistent strategy. He did not go from last to first in the final straight. Rather, he was raced behind for the first half or so of the race; then he would unleash a very long spurt and overtake most of his rivals before even hitting the final turn. (The Takarazukas are notable exceptions.) In such a case, it is difficult to capture his positioning with a single number: in his final Arima, was he raced in the 16th position, or in 2nd, or do we go halfsies, take the average, and say that 9th place represents his positioning best? 
+
+In the end, I decided to use _median_ position at bends as the single number that best represents a horse's overall positioning. 18-18-17-6 becomes 17.5; 16-16-2-3 becomes 9.5. This is an unsatisfactory solution, to be sure. The only consolation is that these cases are not very common.\*
+
+There are other caveats to this statistic. 2-2-2-2 can represent two completely different situations: a horse who's leading the pack far behind the front runner, or a horse that's matching the front runner's pace stride for stride. Moreover, if the racers are grouped tightly, going from 16th place to 1st in the home straight might look more impressive on paper than in practice. This complexity is not captured — and cannot be captured — with just a single number. 
+
+Interpret responsibly!
+
+### Does the Early Pace Dictate the Winner's Positioning?
+
+To recapitulate, received wisdom has it that a fast early pace makes life easier for the late surgers, while a slow early pace favours those stalking at the front. Moreover, Tokyo Racecourse is reputed to favour backliners. If so, we _should_ find that winners of the Japanese Derby are likelier to come from behind if the early sectionals are fast. 
+
+I chose the time taken to run 600m as my metric for "early pace", and plotted it with the median position at bends for each of the Derby winners. My dataset extends back to 1993, and I included only Derbies that were run on ground rated "Good". I have included a least-squares regression line for illustrative purposes — _not_ to demonstrate correlation or statistical significance! 
+
+```{r derby-graph, echo = F}
+pace_graphs("TOKYO YUSHUN (JAPANESE DERBY)")
+
+```
+
+The connection here seems very weak. Fast Derbies have been won by horses towards the front; slow Derbies have been won by those running at the back.
+
+How about the other three-year-old Fuchu G1, the NHK Mile? We'll look at both the 600m and the 400m sectionals, because it's a shorter race.
+
+
+```{r nhk-mile-graph, echo = F}
+pace_graphs("NHK MILE CUP")
+pace_graphs("NHK MILE CUP", 400)
+
+```
+
+Intriguingly, the general pattern _does_ seem to hold true for the NHK Mile, in a way that it doesn't for the Japanese Derby. 
+
+What happens if we look at _podium_ finishes, not just the winners?
+
+```{r podium-graph, echo = FALSE}
+pace_graphs("TOKYO YUSHUN (JAPANESE DERBY)", places = 1:3)
+pace_graphs("NHK MILE CUP", places = 1:3)
+
+```
+
+Interestingly, this seems to barely shift the picture. In fact, the top 3 _within the same year_ seem to come from all over the place, too, and in no particular order. 
