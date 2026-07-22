@@ -10,7 +10,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
-knitr::opts_knit$set(base.dir = "~/Documents/Data-Science/GH-Pages/Horse-Sense/", base.url = "https://github.com/WishfullyThinking/wishfullythinking.github.io")
+knitr::opts_knit$set(base.dir = "~/Documents/Data-Science/GH-Pages/Horse-Sense/", base.url = "/")
 knitr::opts_chunk$set(fig.path = "images/")
 library(tidyverse)
 library(rvest)
