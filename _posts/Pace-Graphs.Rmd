@@ -13,9 +13,6 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 knitr::opts_knit$set(base.dir = "~/Documents/Data-Science/GH-Pages/Horse-Sense/", base.url = "/")
 knitr::opts_chunk$set(fig.path = "images/")
 library(tidyverse)
-library(rvest)
-library(stringi)
-library(lubridate)
 library(gt)
 library(scales)
 library(ggrepel)
@@ -275,6 +272,11 @@ What happens if we look at _podium_ finishes, not just the winners?
 ```{r podium-graph, echo = FALSE}
 pace_graphs("TOKYO YUSHUN (JAPANESE DERBY)", places = 1:3)
 pace_graphs("NHK MILE CUP", places = 1:3)
+pace_graphs("TENNO SHO (AUTUMN)", places = 1:3)
+pace_graphs("JAPAN CUP", places = 1:3)
+
+pace_graphs("ARIMA KINEN", 700, places = 1:3)
+pace_graphs("SATSUKI SHO", 600)
 
 ```
 
