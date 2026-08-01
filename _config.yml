@@ -21,9 +21,9 @@
 title: Horse Sense
 # email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
-Horse racing, by the numbers. The premier source for statistical analysis
-of top-flight competition in Japan, occasionally trespassing into other
-jurisdictions — as the data permits. 
+  Horse racing, by the numbers. The premier source for statistical analysis
+  of top-flight competition in Japan, occasionally trespassing into other
+  jurisdictions — as the data permits. 
  
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
