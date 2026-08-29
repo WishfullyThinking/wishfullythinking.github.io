@@ -1,0 +1,19 @@
+---
+layout: post
+title: College Morality
+output:
+  md_document:
+    variant: markdown_github
+    preserve_yaml: true
+---
+
+
+Consider a class of college students which conspires to cheat on a take-home exam. Most of us dislike idleness and dishonest work in others. However, I submit to you that if you were in that class, you would not snitch — that is, you would not let your principles govern you in this instance. This could be for various reasons: self-interest (you’d like to get a free ride through the course), concern for your classmates (you don’t want them to get into trouble), or simply fear of retaliation (if they do get into trouble you’ll get a bad name). At most your conscientious objection would consist of not being party to the conspiracy, and accepting that you’ll be doing more work for less reward. If someone *did* blow the whistle, you would no doubt resent them and, given the opportunity, make your resentment clear. Such deviant behaviour is simply “not done”.
+
+The interesting thing is that if the professor came to learn of this independently — and gave the class an earful and a proctored exam — nobody in the class would feel as though she did something *wrong*, in the way they might feel about a classmate who snitched. Some might even feel bad in retrospect, because after all, most of us dislike idleness and dishonest work in others…
+
+There is a very simple reason, of course. In the adversarial game between exam-setter and exam-taker, the professor is on the other team. Your team needs to act as a unit, and it does so because everyone is aware of the benefits of cooperating and the perils of defecting. To describe the behaviour of the class as “moral” or “immoral” misses the point. This *is* morality in action, doing exactly what it has evolved to do. When the professor upbraids the lot, she is invoking morality, too, but on a different scale — the scale of the academic institution, or even scholarship as a whole, if she’s feeling particularly pious on the occasion.
+
+The student who *does* sincerely feel that they owe their loyalty to the ideal of academic integrity, and so does not cheat, occupies an interesting place. He can take an easygoing attitude to his classmates, in which case he is admired as a paragon; he can try to preach to his classmates, in which case he is despised as being superior; or he can simply hold them in silent contempt. In all cases, however, what he is preserving is his self-image and conscience. There is a feeling of uncleanliness, a corruption of character, that he seeks to avoid. It is possible that he may gain no advantage from such hygiene in the short run, or even the long. That is, it could be genuinely maladaptive, and bring about suffering — whether economic or emotional — that others nimbly avoid. Or it might help to be known by others as a truthful and fair dealer. However, the ultimate reward for him is surely *internal,* in the preservation of his idea of himself. If he thinks he is rendered bitter, friendless, and cantankerous through his moral exertions, then I would frankly recommend that he abandon himself to a life of vice sooner than expect any recompense for his sacrifices. There is none.
+
+Morality really exists on two levels. On one level, it’s what enables groups of human beings to cooperate, and it is why we have a moral sense at all. But because morality is actuated by emotions — anger, sympathy, pity, awe — it is deeply involved in our overall emotional life, and even when it is not *useful*, it can be beautiful or repulsive. Art from the Epic of Gilgamesh downward has utilised this function of morality to produce its aesthetic effects. Actually all religions and philosophies have sought to win this moral beauty contest, so that people might avoid the narrowly useful in favour of the beautiful.
